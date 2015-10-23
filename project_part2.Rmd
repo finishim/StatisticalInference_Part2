@@ -7,9 +7,9 @@ output: html_document
 
 ## Overview  
 
-We are going to analyze the ToothGrowth data in the R datasets package. A basic summary of the data will be provided. We will use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose.  
+We are going to analyze the ToothGrowth data in the R datasets package. A basic summary of the data will be provided. We will use confidence intervals and/or hypothesis tests to compare tooth growth by supplement (vitamin c and ascorbic acid) and dose.  
 
-## Load & Explore the Data
+## Load & Explore the Data  
 
 We will load the data from the R package dataset.  
 
@@ -20,12 +20,16 @@ data(ToothGrowth)
 str(ToothGrowth)
 ```
 
+Let's first load the libraries we will be using throughout our analysis.  
+
+```{r library, message=FALSE}
+#import ggplot andl dplyr libraries
+library(ggplot2)
+library(dplyr)
+```
+
 Now let's try to visualize the data with some boxplots. That will enable us to see the mean and variance in tooth growth with different dosages of each supplement.  
 
-```{r, message=FALSE}
-#import ggplot library
-library(ggplot2)
-```
 ```{r boxplot1, echo=TRUE, fig.height=3.5, fig.width=5}
 g <- ggplot(data = ToothGrowth, aes(x = factor(dose), y = len)) + geom_boxplot() + facet_grid(.~supp) + 
     xlab("Dose") + ylab("Tooth Length") + ggtitle("Tooth Growth with Different Supplements")
@@ -40,3 +44,16 @@ h
 ```
 
 It is clear from the plots that higher dosage of the supplements cause more tooth growth. The effects of using different supplements is less clear as their effects seems to be similar.  
+
+## Basic Summary of Data  
+
+Let's take a basic look at the data.
+
+```{r summary, echo=TRUE}
+#group the data by dose and then by supplement
+growth <- group_by(ToothGrowth, dose, supp)
+#add mean and standard deviation to the summary table
+growthSummary <- summarize(growth, mean = mean(len), standard.deviation = sd(len))
+growthSummary
+```
+

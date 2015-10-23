@@ -20,15 +20,21 @@ data(ToothGrowth)
 str(ToothGrowth)
 ```
 
-Now let's try to visualize the data with some boxplots. That will enable us to see the mean and variance in tooth growth with different dosages of the different supplements.  
+Now let's try to visualize the data with some boxplots. That will enable us to see the mean and variance in tooth growth with different dosages of each supplement.  
 
 ```{r, message=FALSE}
 #import ggplot library
 library(ggplot2)
 ```
-```{r boxplot, echo=TRUE, fig.height=3.5, fig.width=5}
+```{r boxplot1, echo=TRUE, fig.height=3.5, fig.width=5}
 g <- ggplot(data = ToothGrowth, aes(x = factor(dose), y = len)) + geom_boxplot() + facet_grid(.~supp) + 
     xlab("Dose") + ylab("Tooth Length") + ggtitle("Tooth Growth with Different Supplements")
 g
 ```
 
+Here's another boxplot to see the mean and variance in tooth growth with different supplements for each dosage.
+```{r boxplot2, echo=TRUE, fig.height=3.5, fig.width=5}
+g <- ggplot(data = ToothGrowth, aes(x = factor(supp), y = len)) + geom_boxplot() + facet_grid(.~dose) + 
+    xlab("Supplement") + ylab("Tooth Length") + ggtitle("Tooth Growth with Different Dosages")
+g
+```

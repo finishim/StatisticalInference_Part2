@@ -1,0 +1,34 @@
+---
+title: "Statistical Inference Part 2"
+author: "Nazmi Anik"
+date: "Friday, October 23, 2015"
+output: html_document
+---
+
+## Overview  
+
+We are going to analyze the ToothGrowth data in the R datasets package. A basic summary of the data will be provided. We will use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose.  
+
+## Load the Data
+
+We will load the data from the R package dataset.  
+
+```{r load, echo=TRUE}
+#load the data
+data(ToothGrowth)
+#do a quick summary to see what is inside
+str(ToothGrowth)
+```
+
+Now let's try to visualize the data with some boxplots. That will enable us to see the mean and variance in tooth growth with different dosages of the different supplements.  
+
+```{r, message=FALSE}
+#import ggplot library
+library(ggplot2)
+```
+```{r boxplot, echo=TRUE, fig.height=3.5, fig.width=5}
+g <- ggplot(data = ToothGrowth, aes(x = factor(dose), y = len)) + geom_boxplot() + facet_grid(.~supp) + 
+    xlab("Dose") + ylab("Tooth Length") + ggtitle("Tooth Growth with Different Supplements")
+g
+```
+

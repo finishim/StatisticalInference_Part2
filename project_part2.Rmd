@@ -47,7 +47,7 @@ It is clear from the plots that higher dosage of the supplements cause more toot
 
 ## Basic Summary of Data  
 
-Let's take a basic look at the data.
+Let's take a basic look at the data.  
 
 ```{r summary, echo=TRUE}
 #group the data by dose and then by supplement
@@ -56,4 +56,6 @@ growth <- group_by(ToothGrowth, dose, supp)
 growthSummary <- summarize(growth, mean = mean(len), standard.deviation = sd(len))
 growthSummary
 ```
+
+## Tooth Growth Comparison  
 

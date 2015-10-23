@@ -9,7 +9,7 @@ output: html_document
 
 We are going to analyze the ToothGrowth data in the R datasets package. A basic summary of the data will be provided. We will use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose.  
 
-## Load the Data
+## Load & Explore the Data
 
 We will load the data from the R package dataset.  
 
@@ -34,7 +34,9 @@ g
 
 Here's another boxplot to see the mean and variance in tooth growth with different supplements for each dosage.
 ```{r boxplot2, echo=TRUE, fig.height=3.5, fig.width=5}
-g <- ggplot(data = ToothGrowth, aes(x = factor(supp), y = len)) + geom_boxplot() + facet_grid(.~dose) + 
+h <- ggplot(data = ToothGrowth, aes(x = factor(supp), y = len)) + geom_boxplot() + facet_grid(.~dose) + 
     xlab("Supplement") + ylab("Tooth Length") + ggtitle("Tooth Growth with Different Dosages")
-g
+h
 ```
+
+It is clear from the plots that higher dosage of the supplements cause more tooth growth. The effects of using different supplements is less clear as their effects seems to be similar.  

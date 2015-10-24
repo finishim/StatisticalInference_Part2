@@ -5,47 +5,44 @@ date: "Friday, October 23, 2015"
 output: html_document
 ---
 
-## Overview  
+### Overview  
 
 We are going to analyze the ToothGrowth data in the R datasets package. A basic summary of the data will be provided. We will use confidence intervals and/or hypothesis tests to compare tooth growth by supplement (vitamin c and ascorbic acid) and dose.  
 
-## Load & Explore the Data  
+### Load & Explore the Data  
 
 We will load the data from the R package dataset.  
 
 ```{r load, echo=TRUE}
-#load the data
-data(ToothGrowth)
-#do a quick summary to see what is inside
-str(ToothGrowth)
+#load the data & look at a quick summary
+data(ToothGrowth); str(ToothGrowth)
 ```
 
-Let's first load the libraries we will be using throughout our analysis.  
-
-```{r library, message=FALSE}
+```{r library, message=FALSE, echo=FALSE}
 #import ggplot andl dplyr libraries
-library(ggplot2)
-library(dplyr)
+require(ggplot2)
+require(dplyr)
+require(cowplot)
 ```
 
 Now let's try to visualize the data with some boxplots. That will enable us to see the mean and variance in tooth growth with different dosages of each supplement.  
 
-```{r boxplot1, echo=TRUE, fig.height=3.5, fig.width=5}
+```{r boxplot1, echo=TRUE, fig.height=3.5, fig.width=8}
 g <- ggplot(data = ToothGrowth, aes(x = factor(dose), y = len)) + geom_boxplot() + facet_grid(.~supp) + 
-    xlab("Dose") + ylab("Tooth Length") + ggtitle("Tooth Growth with Different Supplements")
-g
+    xlab("Dose") + ylab("Tooth Length") + ggtitle("Tooth Growth with\nDifferent Supplements")
 ```
 
 Here's another boxplot to see the mean and variance in tooth growth with different supplements for each dosage.
-```{r boxplot2, echo=TRUE, fig.height=3.5, fig.width=5}
+```{r boxplot2, echo=TRUE, fig.height=3.5, fig.width=8}
 h <- ggplot(data = ToothGrowth, aes(x = factor(supp), y = len)) + geom_boxplot() + facet_grid(.~dose) + 
-    xlab("Supplement") + ylab("Tooth Length") + ggtitle("Tooth Growth with Different Dosages")
-h
+    xlab("Supplement") + ylab("Tooth Length") + ggtitle("Tooth Growth with\n Different Dosages")
+#Plot them together
+plot_grid(g, h, align='h', labels=c('A', 'B'))
 ```
 
 It is clear from the plots that higher dosage of the supplements cause more tooth growth. The effects of using different supplements is less clear as their effects seems to be similar.  
 
-## Basic Summary of Data  
+### Basic Summary of Data  
 
 Let's take a basic look at the data.  
 
@@ -53,34 +50,43 @@ Let's take a basic look at the data.
 #group the data by dose and then by supplement
 growth <- group_by(ToothGrowth, dose, supp)
 #add mean and standard deviation to the summary table
-growthSummary <- summarize(growth, mean = mean(len), standard.deviation = sd(len))
-growthSummary
+growthSummary <- summarize(growth, mean = mean(len), standard.deviation = sd(len)); growthSummary
 ```
 
-## Tooth Growth Comparison  
+### Tooth Growth Comparison  
 
-### Assumptions  
+#### Assumptions  
 
-Due to the small sized sample (total of 60 observations), we will use t test to compare tooth growth by supplementals and dosage. We cannot use paired t tests because we are assuming that the pigs were chosen randomly and therefore are independent from different samples. Therefore, paired = FALSE for all the t tests.  
-We are assuming that the variances between separate groups of pigs are the same since the number of observations are the same (ten) for each test. This follows from the assumption that 10 different pigs each time approximately represent the population. Therefore, var.equal = TRUE for all the t tests.  
+We cannot use paired t tests because we are assuming that the pigs were chosen randomly and therefore are independent from different samples. Therefore, paired = FALSE for all the t tests.  
+We are assuming that the variances between separate groups of pigs are not equal. Therefore, var.equal = FALSE for all the t tests.  
 
-### Comparison  
+#### Comparison  
 
-Based on our assumptions, let's test:  
-* Low Dose:  
-```{r lowdose, echo=TRUE}
+Based on our assumptions, let's test if using ascorbic acid (VC) or vitamin c (OJ) gives us a better result in tooth length:  
+```{r supp, echo=TRUE}
+tsupp <- t.test(len~supp,paired=FALSE,var.equal=FALSE,data=growth)
+tsuppDF <- data.frame("p-value"=tsupp$p.value, "Conf-Low"=tsupp$conf[1], "Conf-High"=tsupp$conf[2], "Mean Len OJ"=tsupp$estimate[1], "Mean Len VC"=tsupp$estimate[2], row.names=c("OJ vs VC")); tsuppDF
+```
+
+The confidence interval includes zero. Therefore difference between OJ and VC being zero cannot be ruled out.  
+Now let's see if effectiveness of OJ and VC in tooth growth are different with different dosages:  
+
+```{r dosecompare, echo=TRUE}
+#low dose
 growthLow <- subset(ToothGrowth, dose == 0.5)
-t1 <- t.test(len~supp,paired=FALSE,var.equal=TRUE,data=growthLow)
-```
-
-* Medium Dose:  
-```{r meddose, echo=TRUE}
+t1 <- t.test(len~supp,paired=FALSE,var.equal=FALSE,data=growthLow)
+#medium dose
 growthMed <- subset(ToothGrowth, dose == 1.0)
-t2 <- t.test(len~supp,paired=FALSE,var.equal=TRUE,data=growthMed)
+t2 <- t.test(len~supp,paired=FALSE,var.equal=FALSE,data=growthMed)
+#high dose
+growthHi<- subset(ToothGrowth, dose == 2.0)
+t3 <- t.test(len~supp,paired=FALSE,var.equal=FALSE,data=growthHi)
+#compare
+tcompare <- data.frame("p-value"=c(t1$p.value, t2$p.value, t3$p.value), "Conf-Low"=c(t1$conf[1],t2$conf[1],t3$conf[1]), "Conf-High"=c(t1$conf[2],t2$conf[2],t3$conf[2]), "Mean Len OJ"=c(t1$estimate[1],t2$estimate[1],t3$estimate[1]), "Mean Len VC"=c(t1$estimate[2],t2$estimate[2],t3$estimate[2]), row.names=c("Low Dose","Medium Dose","High Dose" )); tcompare
 ```
 
-* High Dose:
-```{r meddose, echo=TRUE}
-growthHi<- subset(ToothGrowth, dose == 2.0)
-t3 <- t.test(len~supp,paired=FALSE,var.equal=TRUE,data=growthHi)
-```
+We can see that in low and medium doses, OJ is more effective. In the high dose, both OJ and VC have similar effectiveness.  
+
+### Conclusions  
+
+As we have seen from the boxplots, increasing the dosage of either ascorbic acid or vitamin c increased tooth growth in guinea pigs. Based on out t tests, we verified that in low and medium doses vitamin c is more effective, and in high dosage both vitamin c and ascorbic acid show similar effectiveness.  

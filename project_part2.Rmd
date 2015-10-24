@@ -60,6 +60,27 @@ growthSummary
 ## Tooth Growth Comparison  
 
 ### Assumptions  
-Due to the small sized sample (total of 60 observations), we will use t test to compare tooth growth by supplementals and dosage. We cannot use paired t tests because we are assuming that the pigs were chosen randomly and therefore are independent from different samples. We are also assuming that the variances between separate groups of pigs are different; therefore, var.equal = FALSE for all the t tests.  
+
+Due to the small sized sample (total of 60 observations), we will use t test to compare tooth growth by supplementals and dosage. We cannot use paired t tests because we are assuming that the pigs were chosen randomly and therefore are independent from different samples. Therefore, paired = FALSE for all the t tests.  
+We are assuming that the variances between separate groups of pigs are the same since the number of observations are the same (ten) for each test. This follows from the assumption that 10 different pigs each time approximately represent the population. Therefore, var.equal = TRUE for all the t tests.  
 
 ### Comparison  
+
+Based on our assumptions, let's test:  
+* Low Dose:  
+```{r lowdose, echo=TRUE}
+growthLow <- subset(ToothGrowth, dose == 0.5)
+t1 <- t.test(len~supp,paired=FALSE,var.equal=TRUE,data=growthLow)
+```
+
+* Medium Dose:  
+```{r meddose, echo=TRUE}
+growthMed <- subset(ToothGrowth, dose == 1.0)
+t2 <- t.test(len~supp,paired=FALSE,var.equal=TRUE,data=growthMed)
+```
+
+* High Dose:
+```{r meddose, echo=TRUE}
+growthHi<- subset(ToothGrowth, dose == 2.0)
+t3 <- t.test(len~supp,paired=FALSE,var.equal=TRUE,data=growthHi)
+```
